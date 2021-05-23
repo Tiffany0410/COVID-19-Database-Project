@@ -1,0 +1,74 @@
+\i schema.ddl
+\d
+select * from cases;
+select * from closurepolicies;
+select * from enforcemask;
+select * from maskmandate;
+select * from quarantinemandate;
+select * from stateoverview;
+select * from stockmarket;
+select * from unemployinsurance;
+select * from unemployment;
+
+\COPY stateoverview from StateOverview.csv with csv
+\COPY StockMarket from StockMarket.csv with csv
+
+create table temp(
+   month text,
+   location text,
+   rate float);
+
+\COPY temp from temp.csv with csv
+
+drop table Unemployment;
+
+create table Unemployment as(
+    select temp.month, stateoverview.scode, temp.rate 
+    from temp join stateoverview on temp.location = stateoverview.statename
+    );
+
+alter table unemployment add primary key(month, scode);
+
+alter table unemployment add constraint unemployment_scode_fkey foreign key (sCode) references StateOverview;
+
+drop table temp;
+
+create table temp2(
+   dateRecord date,
+   sCode StateCode,
+   dataQuality DataQuality,
+   testTotal integer,
+   testDaily int,
+   positive int,
+   positiveDaily int,
+   death int,
+   deathDaily int,
+   primary key (dateRecord, sCode)
+);
+
+\copy temp2 from 'Cases.csv' HEADER CSV DELIMITER ',';
+
+drop table Cases;
+
+create table Cases as(
+    select dateRecord, sCode, dataQuality, testTotal, testDaily, positive, positiveDaily, death, deathDaily
+    from temp2
+    where sCode != 'AU' and sCode != 'GU' and sCode != 'MP' and sCode != 'PR' and sCode != 'VI'
+    and sCode != 'AS'
+    );
+
+alter table cases add primary key (dateRecord, sCode);
+
+alter table cases add constraint cases_scode_fkey foreign key (sCode) references StateOverview;
+
+drop table temp2;
+
+\copy closurepolicies from ClosurePolicies.csv with csv
+
+\copy QuarantineMandate from QuarantineMandate.csv with csv
+
+\copy UnemployInsurance from UnemployInsurance.csv with csv
+
+\copy MaskMandate from MaskMandate.csv with csv
+
+\copy EnforceMask from EnforceMask.csv with csv

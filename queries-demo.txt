@@ -1,0 +1,467 @@
+\echo ------------- Loading schema and data ------------- 
+\echo 
+\i schema.ddl
+\i import_data.sql
+
+set search_path to underpandemic;
+SET
+
+\echo ------------- Loading queries ------------- 
+\echo 
+
+\i queries.sql
+SET
+
+\echo ------------- Quention 1 ------------- 
+\echo 
+
+psql:queries.sql:15: NOTICE:  view "temp" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:queries.sql:23: NOTICE:  view "over100_beforejune" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:queries.sql:31: NOTICE:  view "over100_afterjune" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:queries.sql:39: NOTICE:  view "states_recovering" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:queries.sql:47: NOTICE:  view "states_severe" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:queries.sql:55: NOTICE:  view "states_mild" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+
+
+-- Q1-Query 1: The policyies of those states in severe situation.
+-- States in severe situation: The States that had days with more than 100 new deaths both before and after June.
+ scode |   statename   | dateschoolclosed | datebusinessclosed | datequarantine |  datemask  
+-------+---------------+------------------+--------------------+----------------+------------
+ CA    | California    |                  | 2020-03-19         |                | 2020-06-18
+ FL    | Florida       | 2020-03-17       | 2020-03-20         | 2020-03-24     | 2020-05-11
+ IL    | Illinois      | 2020-03-17       | 2020-03-21         |                | 2020-05-01
+ MA    | Massachusetts | 2020-03-16       | 2020-03-24         | 2020-03-27     | 2020-05-06
+ NJ    | New Jersey    | 2020-03-18       | 2020-03-21         |                | 2020-04-08
+(5 rows)
+
+-- Q1-Query 2: The policies of the states that were recovering.
+-- States that were recovering: The States that had days with more than 100 daily new deaths before June, but not after.
+ scode |  statename   | dateschoolclosed | datebusinessclosed | datequarantine |  datemask  
+-------+--------------+------------------+--------------------+----------------+------------
+ CO    | Colorado     | 2020-03-23       | 2020-03-26         |                | 2020-07-16
+ CT    | Connecticut  | 2020-03-17       | 2020-03-23         | 2020-06-25     | 2020-04-20
+ IN    | Indiana      | 2020-03-20       | 2020-03-25         |                | 2020-07-27
+ LA    | Louisiana    | 2020-03-16       | 2020-03-23         |                | 2020-05-01
+ MI    | Michigan     | 2020-03-16       | 2020-03-24         |                | 2020-04-27
+ NY    | New York     | 2020-03-18       | 2020-03-22         | 2020-06-25     | 2020-04-17
+ OH    | Ohio         | 2020-03-17       | 2020-03-24         |                | 2020-07-23
+ PA    | Pennsylvania | 2020-03-16       | 2020-03-19         |                | 2020-07-01
+(8 rows)
+
+-- Q1-Query 3: The policies of the states in mild pandemic.
+-- States that have never had days with more than 10 new deaths.
+ scode |  statename   | dateschoolclosed | datebusinessclosed | datequarantine |  datemask  
+-------+--------------+------------------+--------------------+----------------+------------
+ AK    | Alaska       | 2020-03-16       | 2020-03-28         | 2020-03-25     | 2020-04-24
+ ME    | Maine        | 2020-04-02       | 2020-03-25         | 2020-04-03     | 2020-05-01
+ MT    | Montana      | 2020-03-16       | 2020-03-28         | 2020-03-30     | 
+ ND    | North Dakota | 2020-03-16       | 2020-03-20         | 2020-03-28     | 2020-04-28
+ SD    | South Dakota | 2020-03-16       |                    |                | 
+ UT    | Utah         | 2020-03-16       |                    | 2020-04-10     | 2020-04-10
+ VT    | Vermont      | 2020-03-18       | 2020-03-25         | 2020-03-30     | 2020-08-01
+ WY    | Wyoming      | 2020-03-19       | 2020-03-19         |                | 2020-05-01
+(8 rows)
+
+\echo ------------- Quention 2 ------------- 
+\echo 
+
+psql:queries.sql:93: NOTICE:  view "lowpoverty" does not exist, skipping
+DROP VIEW
+psql:queries.sql:94: NOTICE:  view "moderatepoverty" does not exist, skipping
+DROP VIEW
+psql:queries.sql:95: NOTICE:  view "highpoverty" does not exist, skipping
+DROP VIEW
+psql:queries.sql:96: NOTICE:  view "lowpopdensity" does not exist, skipping
+DROP VIEW
+psql:queries.sql:97: NOTICE:  view "highpopdensity" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+
+-- Q2-Query 2.1: Showcases the daily average of positive cases and death cases for all low poverty states in each month
+ month | avg_positive_daily | avg_death_daily 
+-------+--------------------+-----------------
+     3 |                 51 |               1
+     4 |                390 |              29
+     5 |                388 |              26
+     6 |                171 |               9
+     7 |                209 |               4
+     8 |                242 |               3
+     9 |                217 |               3
+(7 rows)
+
+-- Q2-Query 2.2: Showcases the daily average of positive cases and death cases for moderate poverty states in each month
+ month | avg_positive_daily | avg_death_daily 
+-------+--------------------+-----------------
+     3 |                196 |               4
+     4 |                729 |              48
+     5 |                515 |              32
+     6 |                478 |              14
+     7 |               1035 |              13
+     8 |                826 |              15
+     9 |                725 |              13
+(7 rows)
+
+-- Q2-Query 2.3: Showcases the daily average of positive cases and death cases for high poverty states in each month
+ month | avg_positive_daily | avg_death_daily 
+-------+--------------------+-----------------
+     3 |                 58 |               1
+     4 |                285 |              13
+     5 |                341 |              13
+     6 |                787 |              11
+     7 |               1819 |              25
+     8 |               1275 |              33
+     9 |               1029 |              23
+(7 rows)
+
+CREATE VIEW
+CREATE VIEW
+
+-- Q2-Query 4.1: Showcases the daily average of positive cases and death cases for low population density states 
+ month | avg_positive_daily | avg_death_daily 
+-------+--------------------+-----------------
+     3 |                 33 |               1
+     4 |                145 |               7
+     5 |                185 |               7
+     6 |                289 |               5
+     7 |                617 |               8
+     8 |                466 |               9
+     9 |                502 |               7
+(7 rows)
+
+-- Q2-Query 4.2: Showcases the daily average of positive cases and death cases for high population density states 
+ month | avg_positive_daily | avg_death_daily 
+-------+--------------------+-----------------
+     3 |                251 |               5
+     4 |               1015 |              66
+     5 |                734 |              45
+     6 |                810 |              21
+     7 |               1808 |              24
+     8 |               1376 |              30
+     9 |               1058 |              24
+(7 rows)
+
+-- Q2-5.1: Showcases the daily average of positive cases and death cases for states 
+-- that have low or moderate poverty and low population density.
+ month | avg_positive_daily | avg_death_daily 
+-------+--------------------+-----------------
+     3 |                 30 |               1
+     4 |                166 |               9
+     5 |                207 |               9
+     6 |                168 |               4
+     7 |                340 |               3
+     8 |                342 |               4
+     9 |                420 |               4
+(7 rows)
+
+-- Q2-Query 5.2: Showcases the daily average of positive cases and death cases for states 
+-- that have high poverty and high population density.
+ month | avg_positive_daily | avg_death_daily 
+-------+--------------------+-----------------
+     3 |                 68 |               1
+     4 |                369 |              14
+     5 |                474 |              15
+     6 |               1041 |              13
+     7 |               2557 |              34
+     8 |               1937 |              49
+     9 |               1538 |              34
+(7 rows)
+
+psql:queries.sql:198: NOTICE:  view "severe_states_overview" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:queries.sql:203: NOTICE:  view "severe_states_avg" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:queries.sql:209: NOTICE:  view "recovering_states_overview" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:queries.sql:214: NOTICE:  view "recovering_states_avg" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:queries.sql:220: NOTICE:  view "mild_states_overview" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:queries.sql:225: NOTICE:  view "mild_states_avg" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+
+-- Q2-Query 6.1: Showcases the population density and the percent of poverty of the states in severe situation.
+   statename   | popu_density | percent_poverty 
+---------------+--------------+-----------------
+ California    |       241.65 |            14.3
+ Florida       |        323.9 |            14.8
+ Illinois      |          220 |            13.1
+ Massachusetts |       653.98 |            10.8
+ New Jersey    |      1021.27 |            10.4
+(5 rows)
+
+-- Q2-Query 6.2 Showcases the average population density and the average percent of poverty in the states in severe situation.
+ avg_density | avg_percent_poverty 
+-------------+---------------------
+      492.16 |               12.68
+(1 row)
+
+-- Q2-Query 6.3: Showcases the population density and the percent of poverty of the recovering states.
+  statename   | popu_density | percent_poverty 
+--------------+--------------+-----------------
+ Colorado     |        54.72 |            10.9
+ Connecticut  |       644.54 |              10
+ Indiana      |       183.74 |            14.1
+ Louisiana    |        88.97 |            19.4
+ Michigan     |       103.36 |              15
+ New York     |       358.21 |            14.6
+ Ohio         |       260.77 |            14.5
+ Pennsylvania |       278.09 |            12.8
+(8 rows)
+
+-- Q2-Query 6.4 Showcases the average population density and the average percent of poverty in the recovering states 
+ avg_density | avg_percent_poverty 
+-------------+---------------------
+      246.55 |             13.9125
+(1 row)
+
+-- Q2-Query 6.5: Showcases the population density and the percent of poverty of the states in mild situation.
+  statename   | popu_density | percent_poverty 
+--------------+--------------+-----------------
+ Alaska       |         1.11 |            10.8
+ Maine        |        37.83 |            12.5
+ Montana      |         7.22 |            13.7
+ North Dakota |        10.75 |            10.9
+ South Dakota |        11.44 |            13.6
+ Utah         |        37.23 |            10.3
+ Vermont      |        65.13 |            11.2
+ Wyoming      |         5.91 |            11.1
+(8 rows)
+
+-- Q2-Query 6.6 Showcases the average population density and the average percent of poverty in the states with mild situation.
+ avg_density | avg_percent_poverty 
+-------------+---------------------
+     22.0775 |             11.7625
+(1 row)
+
+\echo ------------- Quention 3 ------------- 
+\echo 
+
+-- Q3-Query 1.1: Stock market in *2020* from January to August that showcases the average price and volume for each month.
+ stock  | month | avg_price | avg_volume 
+--------+-------+-----------+------------
+ Dow    |     1 |     28874 |  293846190
+ Dow    |     2 |     28565 |  367999474
+ Dow    |     3 |     22592 |  705506364
+ Dow    |     4 |     23279 |  466457143
+ Dow    |     5 |     24265 |  397031500
+ Dow    |     6 |     26044 |  441385455
+ Dow    |     7 |     26377 |  373198636
+ Dow    |     8 |     27786 |  354874286
+ Nasdaq |     1 |      9226 | 2497921429
+ Nasdaq |     2 |      9424 | 2822839474
+ Nasdaq |     3 |      7757 | 4403365455
+ Nasdaq |     4 |      8283 | 3747482857
+ Nasdaq |     5 |      9098 | 3817390000
+ Nasdaq |     6 |      9825 | 5066148636
+ Nasdaq |     7 |     10481 | 4287325909
+ Nasdaq |     8 |     11194 | 3733725238
+ S&P    |     1 |      3277 | 3671639048
+ S&P    |     2 |      3281 | 4436435263
+ S&P    |     3 |      2646 | 7354595455
+ S&P    |     4 |      2760 | 5864926190
+ S&P    |     5 |      2919 | 5339955000
+ S&P    |     6 |      3102 | 5956545455
+ S&P    |     7 |      3203 | 4418046364
+ S&P    |     8 |      3387 | 4019157143
+(24 rows)
+
+-- Q3-Query 1.2: Stock market in *2019* from October to Decemeber that showcases the average price and volume for each month.
+ stock  | month | avg_price | avg_volume 
+--------+-------+-----------+------------
+ Dow    |    10 |     26878 |  246382353
+ Dow    |    11 |     27768 |  246259000
+ Dow    |    12 |     28168 |  242232381
+ Nasdaq |    10 |      8141 | 1863890588
+ Nasdaq |    11 |      8508 | 2079099500
+ Nasdaq |    12 |      8774 | 2187660952
+ S&P    |    10 |      2997 | 3370760588
+ S&P    |    11 |      3102 | 3608996000
+ S&P    |    12 |      3176 | 3431142857
+(9 rows)
+
+-- Q3-Query 2.1: Stock market in 2020 from Februray to March that showcases the percent chanege for price and volume 
+-- since Februray for stock S&P.
+ stock |    date    | price_prechange | volume_prechange 
+-------+------------+-----------------+------------------
+ S&P   | 2020-02-21 |           -0.03 |             1.04
+ S&P   | 2020-02-24 |            0.00 |             1.29
+ S&P   | 2020-02-25 |            0.02 |             1.49
+ S&P   | 2020-02-26 |            0.03 |             1.46
+ S&P   | 2020-02-27 |            0.07 |             1.88
+ S&P   | 2020-02-28 |            0.11 |             2.28
+ S&P   | 2020-03-02 |            0.07 |             1.70
+ S&P   | 2020-03-03 |            0.06 |             1.69
+ S&P   | 2020-03-04 |            0.05 |             1.34
+ S&P   | 2020-03-05 |            0.06 |             1.48
+ S&P   | 2020-03-06 |            0.09 |             1.74
+ S&P   | 2020-03-09 |            0.14 |             2.24
+ S&P   | 2020-03-10 |            0.14 |             2.03
+ S&P   | 2020-03-11 |            0.15 |             1.96
+ S&P   | 2020-03-12 |            0.21 |             2.35
+ S&P   | 2020-03-13 |            0.20 |             2.20
+ S&P   | 2020-03-16 |            0.24 |             2.07
+ S&P   | 2020-03-17 |            0.24 |             2.22
+ S&P   | 2020-03-18 |            0.27 |             2.33
+ S&P   | 2020-03-19 |            0.26 |             2.11
+ S&P   | 2020-03-20 |            0.27 |             2.41
+ S&P   | 2020-03-23 |            0.31 |             1.97
+ S&P   | 2020-03-24 |            0.26 |             2.01
+ S&P   | 2020-03-25 |            0.23 |             2.20
+ S&P   | 2020-03-26 |            0.21 |             2.06
+ S&P   | 2020-03-27 |            0.21 |             1.65
+ S&P   | 2020-03-30 |            0.20 |             1.53
+ S&P   | 2020-03-31 |            0.20 |             1.75
+(28 rows)
+
+-- Q3-Query 2.2: Stock market in 2020 from Februray to March that showcases the percent chanege for price and volume 
+-- since Februray for stock Dow.
+ stock |    date    | price_prechange | volume_prechange 
+-------+------------+-----------------+------------------
+ Dow   | 2020-02-21 |           -0.02 |             1.01
+ Dow   | 2020-02-24 |            0.01 |             1.47
+ Dow   | 2020-02-25 |            0.03 |             1.67
+ Dow   | 2020-02-26 |            0.04 |             1.53
+ Dow   | 2020-02-27 |            0.08 |             2.16
+ Dow   | 2020-02-28 |            0.12 |             2.97
+ Dow   | 2020-03-02 |            0.09 |             2.07
+ Dow   | 2020-03-03 |            0.07 |             2.10
+ Dow   | 2020-03-04 |            0.06 |             1.49
+ Dow   | 2020-03-05 |            0.08 |             1.55
+ Dow   | 2020-03-06 |            0.10 |             1.95
+ Dow   | 2020-03-09 |            0.14 |             2.44
+ Dow   | 2020-03-10 |            0.14 |             2.13
+ Dow   | 2020-03-11 |            0.16 |             2.16
+ Dow   | 2020-03-12 |            0.23 |             2.95
+ Dow   | 2020-03-13 |            0.22 |             2.74
+ Dow   | 2020-03-16 |            0.26 |             2.50
+ Dow   | 2020-03-17 |            0.28 |             2.58
+ Dow   | 2020-03-18 |            0.31 |             2.83
+ Dow   | 2020-03-19 |            0.30 |             2.53
+ Dow   | 2020-03-20 |            0.30 |             2.83
+ Dow   | 2020-03-23 |            0.34 |             2.56
+ Dow   | 2020-03-24 |            0.29 |             2.60
+ Dow   | 2020-03-25 |            0.25 |             2.59
+ Dow   | 2020-03-26 |            0.23 |             2.29
+ Dow   | 2020-03-27 |            0.23 |             1.91
+ Dow   | 2020-03-30 |            0.23 |             1.77
+ Dow   | 2020-03-31 |            0.22 |             1.86
+(28 rows)
+
+-- Q3-Query 2.3: Stock market in 2020 from Februray to March that showcases the percent chanege for price and volume 
+-- since Februray for stock Nasdaq.
+ stock  |    date    | price_prechange | volume_prechange 
+--------+------------+-----------------+------------------
+ Nasdaq | 2020-02-21 |           -0.04 |             0.13
+ Nasdaq | 2020-02-24 |            0.00 |             0.31
+ Nasdaq | 2020-02-25 |            0.01 |             0.48
+ Nasdaq | 2020-02-26 |            0.02 |             0.47
+ Nasdaq | 2020-02-27 |            0.06 |             0.87
+ Nasdaq | 2020-02-28 |            0.09 |             1.19
+ Nasdaq | 2020-03-02 |            0.05 |             0.75
+ Nasdaq | 2020-03-03 |            0.04 |             0.79
+ Nasdaq | 2020-03-04 |            0.04 |             0.49
+ Nasdaq | 2020-03-05 |            0.05 |             0.55
+ Nasdaq | 2020-03-06 |            0.08 |             0.77
+ Nasdaq | 2020-03-09 |            0.12 |             0.87
+ Nasdaq | 2020-03-10 |            0.12 |             0.83
+ Nasdaq | 2020-03-11 |            0.13 |             0.77
+ Nasdaq | 2020-03-12 |            0.19 |             1.09
+ Nasdaq | 2020-03-13 |            0.18 |             0.94
+ Nasdaq | 2020-03-16 |            0.23 |             0.90
+ Nasdaq | 2020-03-17 |            0.23 |             1.02
+ Nasdaq | 2020-03-18 |            0.25 |             1.02
+ Nasdaq | 2020-03-19 |            0.23 |             0.97
+ Nasdaq | 2020-03-20 |            0.23 |             1.16
+ Nasdaq | 2020-03-23 |            0.26 |             0.79
+ Nasdaq | 2020-03-24 |            0.21 |             0.82
+ Nasdaq | 2020-03-25 |            0.19 |             0.93
+ Nasdaq | 2020-03-26 |            0.17 |             0.65
+ Nasdaq | 2020-03-27 |            0.18 |             0.64
+ Nasdaq | 2020-03-30 |            0.17 |             0.59
+ Nasdaq | 2020-03-31 |            0.16 |             0.68
+(28 rows)
+
+-- Q3-Query 3.1: Unemployment rate for California from January to August.
+ statename  |  month   | rate  
+------------+----------+-------
+ California | January  | 0.039
+ California | Februray | 0.039
+ California | March    | 0.053
+ California | April    | 0.164
+ California | May      | 0.164
+ California | June     | 0.149
+ California | July     | 0.133
+ California | August   | 0.114
+(8 rows)
+
+-- Q3-Query 3.2: Unemployment rate for Washington from January to August.
+ statename  |  month   | rate  
+------------+----------+-------
+ Washington | January  | 0.039
+ Washington | Februray | 0.038
+ Washington | March    | 0.051
+ Washington | April    | 0.163
+ Washington | May      | 0.151
+ Washington | June     |   0.1
+ Washington | July     | 0.103
+ Washington | August   | 0.085
+(8 rows)
+
+-- Q3-Query 3.3: Unemployment rate for Michigan from January to August.
+ statename |  month   | rate  
+-----------+----------+-------
+ Michigan  | January  | 0.038
+ Michigan  | Februray | 0.036
+ Michigan  | March    | 0.041
+ Michigan  | April    |  0.24
+ Michigan  | May      | 0.213
+ Michigan  | June     | 0.149
+ Michigan  | July     | 0.087
+ Michigan  | August   | 0.087
+(8 rows)
+
+-- Q3-Query 3.4: Unemployment rate for New York from January to August.
+ statename |  month   | rate  
+-----------+----------+-------
+ New York  | January  | 0.038
+ New York  | Februray | 0.037
+ New York  | March    | 0.045
+ New York  | April    | 0.153
+ New York  | May      | 0.145
+ New York  | June     | 0.156
+ New York  | July     | 0.159
+ New York  | August   | 0.125
+(8 rows)
+
+-- Q3-Query 4: Average unemployment rate for each month.
+  month   | round 
+----------+-------
+ August   |  0.08
+ March    |  0.04
+ July     |  0.09
+ Februray |  0.04
+ January  |  0.04
+ April    |  0.14
+ May      |  0.12
+ June     |  0.10
+(8 rows)
